@@ -1,0 +1,73 @@
+package com.customql;
+
+import java_cup.runtime.*;
+import com.customql.ast.*;
+
+parser code {:
+    public void syntax_error(Symbol cur_token) {
+        throw new RuntimeException("Syntax error at line " + (cur_token.left + 1) + ", column " + (cur_token.right + 1));
+    }
+:}
+
+/* Terminals */
+terminal GET, WHERE, AND, OR, SORT, BY, ASC, DESC, SEMI;
+terminal GT, LT, EQ, GTE, LTE, NEQ;
+terminal String IDENTIFIER, NUMBER_LITERAL, STRING_LITERAL;
+
+/* Non-terminals */
+non terminal QueryNode query;
+non terminal AstNode expresion_logica;
+non terminal AstNode termino_logico;
+non terminal ConditionNode condicion;
+non terminal String operador;
+non terminal String valor;
+non terminal SortNode criterio_orden;
+non terminal String direccion;
+
+/* Start symbol */
+start with query;
+
+/* Rules */
+
+query ::= GET IDENTIFIER:id WHERE expresion_logica:expr criterio_orden:sort SEMI
+        {: RESULT = new QueryNode(id, expr, sort); :}
+        ;
+
+expresion_logica ::= expresion_logica:left OR termino_logico:right
+                   {: RESULT = new LogicalExpressionNode(left, right); :}
+                   | termino_logico:term
+                   {: RESULT = term; :}
+                   ;
+
+termino_logico ::= termino_logico:left AND condicion:right
+                 {: RESULT = new LogicalTermNode(left, right); :}
+                 | condicion:cond
+                 {: RESULT = cond; :}
+                 ;
+
+condicion ::= IDENTIFIER:id operador:op valor:val
+            {: RESULT = new ConditionNode(id, op, val); :}
+            ;
+
+operador ::= GT  {: RESULT = ">"; :}
+           | LT  {: RESULT = "<"; :}
+           | EQ  {: RESULT = "="; :}
+           | GTE {: RESULT = ">="; :}
+           | LTE {: RESULT = "<="; :}
+           | NEQ {: RESULT = "!="; :}
+           ;
+
+valor ::= NUMBER_LITERAL:num {: RESULT = num; :}
+        | STRING_LITERAL:str {: RESULT = str; :}
+        ;
+
+criterio_orden ::= SORT BY IDENTIFIER:id direccion:dir
+                 {: RESULT = new SortNode(id, dir); :}
+                 | /* empty */
+                 {: RESULT = null; :}
+                 ;
+
+direccion ::= ASC  {: RESULT = "ASC"; :}
+            | DESC {: RESULT = "DESC"; :}
+            | /* empty */ {: RESULT = "ASC"; /* Default direction if missing, or null. Let's say null */ :}
+            ;

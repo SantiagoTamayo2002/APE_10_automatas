@@ -1,0 +1,12 @@
+com\customql\ast\ConditionNode.class
+com\customql\ast\SortNode.class
+com\customql\ast\QueryNode.class
+com\customql\CustomParser.class
+com\customql\ast\LogicalTermNode.class
+com\customql\CustomLexer.class
+com\customql\ast\AstNode.class
+com\customql\ast\LogicalExpressionNode.class
+com\customql\CustomQlApplication.class
+com\customql\controller\AnalyzeController.class
+com\customql\CustomParser$CUP$CustomParser$actions.class
+com\customql\sym.class
